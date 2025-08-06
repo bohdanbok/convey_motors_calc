@@ -1,209 +1,172 @@
-# ConveyMotors Contract Calculator
+# 🚗 ConveyMotors Contract Calculator
 
-A modern, responsive web application for generating vehicle purchase contracts with real-time calculations and n8n webhook integration.
+A modern, responsive web application for generating vehicle purchase contracts with real-time calculations and professional form handling.
 
-## Features
+## ✨ Features
 
-- **Two-Column Layout**: Form input on the left, real-time preview on the right
-- **Real-time Calculations**: Automatic financial calculations as you type
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Form Validation**: Comprehensive validation with error messages
-- **n8n Integration**: Sends data via webhook to n8n for PDF generation
-- **Modern UI**: Beautiful gradient design with smooth animations
-- **Auto-save**: Form data persistence (optional)
-- **All Required Fields**: Includes all template variables from your contract
+### 📋 **Smart Form Management**
+- **Two-column layout** - Form on the left, real-time preview on the right
+- **Responsive design** - Works perfectly on all devices
+- **Template selection** - NJ, NY, PA state templates with automatic tax calculations
+- **Conditional sections** - Trade-in, Co-buyer, and Lien information with toggle switches
 
-## Template Variables Supported
+### 🔒 **Advanced Field Controls**
+- **Locked fields** - DocFee, LoJack, and Sales Tax with unlockable protection
+- **Dynamic accessories/services** - Add up to 4 custom items with automatic calculations
+- **Fixed field naming** - Stable field names for reliable webhook integration
+- **Real-time validation** - Instant feedback with professional error handling
 
-The form includes all the template variables from your contract:
+### 💰 **Financial Calculations**
+- **Automatic calculations** - Trade difference, taxes, totals, and monthly payments
+- **Currency formatting** - Professional display with proper rounding to cents
+- **Tax handling** - NJ state tax (6.625%) with automatic calculation
+- **Payment estimates** - Monthly payment calculations with 4.9% APR
 
-### Personal Information
-- `{{full_name}}` - Buyer's full name
-- `{{buyer_dob}}` - Date of birth
-- `{{buyer_gender}}` - Gender
-- `{{buyer_eye}}` - Eye color
-- `{{buyer_license}}` - Driver license number
+### 🎯 **Professional UX**
+- **Loading modals** - Beautiful progress indicators during contract generation
+- **Success feedback** - Confirmation modals with automatic form reset
+- **Form validation** - Comprehensive validation with clear error messages
+- **Auto-save functionality** - Form data persists during session
 
-### Contact Information
-- `{{buyer_address}}` - Address
-- `{{buyer_city}}` - City
-- `{{buyer_state}}` - State
-- `{{buyer_zip}}` - ZIP code
-- `{{buyer_cellphone}}` - Cell phone
-- `{{buyer_residencephone}}` - Residence phone
+## 🚀 Quick Start
 
-### Vehicle Information
-- `{{car_year}}` - Vehicle year
-- `{{car_make}}` - Vehicle make
-- `{{car_model}}` - Vehicle model
-- `{{car_body}}` - Body style
-- `{{car_color}}` - Color
-- `{{car_miles}}` - Mileage
-- `{{car_vin}}` - VIN number
-- `{{car_price}}` - Car price
+### **Local Development**
+```bash
+# Clone the repository
+git clone https://github.com/bohdanbok/convey_motors_calc.git
+cd convey_motors_calc
 
-### Trade-in Information
-- `{{tradein_year}}` - Trade-in year
-- `{{tradein_make}}` - Trade-in make
-- `{{tradein_model}}` - Trade-in model
-- `{{tradein_price}}` - Trade-in value
-- `{{trade_diff}}` - Trade difference (calculated)
+# Start local server
+python3 -m http.server 8000
 
-### Financial Information
-- `{{deposit_price}}` - Deposit amount
-- `{{docfee_price}}` - Documentation fee
-- `{{salestax_price}}` - Sales tax
-- `{{gov_fee}}` - Government fee
-- `{{dealerpreparation_fee}}` - Dealer preparation fee
-- `{{certification_bundle_fee}}` - Certification bundle fee
-- `{{sellingaddons_price}}` - Selling add-ons
-- `{{total_acc}}` - Total accessories
-- `{{total_service}}` - Total service
-- `{{duenow_price}}` - Amount due (calculated)
+# Open in browser
+open http://localhost:8000
+```
 
-### Additional Information
-- `{{contract_template}}` - Contract template (NJ, NY, PA)
-- `{{cobuyerfull_name}}` - Co-buyer name
-- `{{sales_person}}` - Sales person
-- `{{dealer_stock}}` - Dealer stock
-- `{{date_value}}` - Contract date
+### **Production Deployment**
+1. Upload all files to your web server
+2. Configure webhook URL in `config.js`
+3. Set up n8n workflow (see `n8n-setup.md`)
+4. Test with sample data
 
-### Lien Information
-- `{{lien_name}}` - Lien holder name
-- `{{lien_address}}` - Lien holder address
-- `{{lien_city}}` - Lien holder city
-- `{{lien_state}}` - Lien holder state
-- `{{lien_zip}}` - Lien holder ZIP
+## 📁 Project Structure
 
-## Setup Instructions
+```
+convey_motors_calc/
+├── index.html              # Main application file
+├── config.js               # Configuration settings
+├── logo.png                # Company logo
+├── js/
+│   ├── calculator.js       # Financial calculations engine
+│   ├── form-handler.js     # Form management and validation
+│   └── preview.js          # Real-time preview generation
+├── styles/
+│   ├── main.css           # Core styling and layout
+│   ├── form.css           # Form-specific styles
+│   └── preview.css        # Preview panel styles
+└── docs/
+    ├── README.md          # This file
+    ├── QUICK-START.md     # Quick setup guide
+    └── n8n-setup.md       # n8n integration guide
+```
 
-### 1. Download and Extract
-Download the project files and extract them to your web server directory.
+## 🔧 Configuration
 
-### 2. Configure Webhook URL
-Edit the `config.js` file and update the webhook URL:
-
+### **Webhook Setup**
+Edit `config.js` to set your webhook URL:
 ```javascript
-const CONFIG = {
-    webhookUrl: 'https://your-n8n-instance.com/webhook/contract-generator',
-    // ... other settings
+const config = {
+    webhookUrl: 'https://your-n8n-instance.com/webhook/contract-generator'
 };
 ```
 
-### 3. n8n Webhook Setup
-In your n8n workflow:
+### **Template Configuration**
+- **NJ Template** - Includes 6.625% sales tax calculation
+- **NY Template** - No sales tax calculation
+- **PA Template** - No sales tax calculation
 
-1. Add a **Webhook** node
-2. Set the HTTP method to `POST`
-3. Copy the webhook URL from n8n
-4. Update the `config.js` file with this URL
-5. Connect the webhook to your PDF generation workflow
+## 📊 Data Fields
 
-### 4. Deploy to Web Server
-Upload all files to your web server. The application works with any static file hosting service.
+### **Core Fields (Always Sent)**
+- Personal & Contact Information (name, address, phone, etc.)
+- Vehicle Information (year, make, model, VIN, price)
+- Financial Information (fees, down payment, taxes)
+- Contract Template Selection
 
-## File Structure
+### **Conditional Fields**
+- **Trade-in Information** - When trade-in toggle is enabled
+- **Co-buyer Information** - When co-buyer toggle is enabled
+- **Lien Information** - When lien type is not 'cash'
 
+### **Dynamic Fields**
+- **Accessories** - Up to 4 custom accessories (name + amount)
+- **Services** - Up to 4 custom services (name + amount)
+
+### **Calculated Fields**
+- Trade difference, subtotal, taxes, total due, monthly payment
+- All amounts rounded to 2 decimal places (cents)
+
+## 🎨 Customization
+
+### **Styling**
+- Modular CSS structure for easy customization
+- CSS variables for consistent theming
+- Responsive design patterns
+
+### **Functionality**
+- Extensible JavaScript architecture
+- Plugin-style calculator system
+- Configurable validation rules
+
+## 🔗 Integration
+
+### **n8n Workflow**
+See `n8n-setup.md` for complete integration guide:
+- Webhook endpoint configuration
+- PDF generation setup
+- Email delivery automation
+- Data processing workflows
+
+### **Webhook Data Format**
+```json
+{
+  "contract_template": "NJ",
+  "full_name": "John Doe",
+  "car_price": "25000",
+  "accessories_name_extra_1": "GPS Navigation",
+  "accessories_amount_extra_1": "500",
+  "amountDue": 17704.23,
+  "calculated_at": "2024-01-15T10:30:00.000Z"
+}
 ```
-ConveyMotors Contract/
-├── index.html              # Main HTML file
-├── config.js               # Configuration settings
-├── styles/
-│   ├── main.css           # Global styles and layout
-│   ├── form.css           # Form-specific styles
-│   └── preview.css        # Preview column styles
-├── js/
-│   ├── calculator.js      # Financial calculations
-│   ├── preview.js         # Real-time preview
-│   └── form-handler.js    # Form handling and webhook
-└── README.md              # This file
-```
 
-## Usage
+## 🛠️ Technical Details
 
-### For Clients
-1. Open the application in a web browser
-2. Fill out the form on the left side
-3. See real-time preview on the right side
-4. Review all calculations and information
-5. Click "Generate Contract" to submit
+### **Browser Support**
+- Chrome 80+
+- Firefox 75+
+- Safari 13+
+- Edge 80+
 
-### For Administrators
-1. Configure the webhook URL in `config.js`
-2. Set up n8n workflow to receive webhook data
-3. Configure PDF generation in n8n
-4. Test the complete workflow
+### **Dependencies**
+- No external dependencies
+- Pure HTML, CSS, and JavaScript
+- Modern ES6+ features
 
-## Configuration Options
+### **Performance**
+- Optimized calculations
+- Efficient DOM updates
+- Minimal memory usage
+- Fast form validation
 
-### Webhook Settings
-- `webhookUrl`: Your n8n webhook URL
-- `webhookHeaders`: Additional headers if needed
+## 📝 License
 
-### Validation Settings
-- `minCarPrice`: Minimum car price validation
-- `maxCarPrice`: Maximum car price validation
-- `requiredFields`: Array of required field names
+This project is proprietary software developed for ConveyMotors.
 
-### Financial Settings
-- `defaultInterestRate`: Default interest rate for calculations
-- `defaultLoanTerm`: Default loan term in years
-- `defaultSalesTaxRate`: Default sales tax rate
+## 🤝 Support
 
-### UI Settings
-- `autoSave`: Enable/disable form auto-save
-- `showAnimations`: Enable/disable animations
-- Theme colors for customization
+For technical support or feature requests, please contact the development team.
 
-## Browser Compatibility
+---
 
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
-
-## Security Considerations
-
-- The application runs entirely in the browser
-- No sensitive data is stored on the server
-- Webhook data is sent via HTTPS
-- Form validation prevents invalid submissions
-
-## Customization
-
-### Styling
-All styles are modular and can be easily customized:
-- `styles/main.css` - Global layout and colors
-- `styles/form.css` - Form appearance
-- `styles/preview.css` - Preview column styling
-
-### Functionality
-- `js/calculator.js` - Financial calculation logic
-- `js/preview.js` - Preview rendering
-- `js/form-handler.js` - Form handling and webhook
-
-## Troubleshooting
-
-### Webhook Not Working
-1. Check the webhook URL in `config.js`
-2. Verify n8n webhook is active
-3. Check browser console for errors
-4. Test webhook with a tool like Postman
-
-### Form Not Calculating
-1. Check browser console for JavaScript errors
-2. Verify all required fields are filled
-3. Check number input formatting
-
-### Styling Issues
-1. Clear browser cache
-2. Check CSS file paths
-3. Verify all style files are loaded
-
-## Support
-
-For technical support or customization requests, please contact your development team.
-
-## License
-
-This project is proprietary software for ConveyMotors use only. 
+**Built with ❤️ for ConveyMotors** 
