@@ -115,7 +115,8 @@ class ContractCalculator {
         if (amount === 0 || amount === null || amount === undefined) {
             return '$0.00';
         }
-        return `$${this.roundToCents(amount).toFixed(2)}`;
+        const roundedAmount = this.roundToCents(amount);
+        return `$${roundedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
     // Get all calculations
@@ -229,8 +230,8 @@ class ContractCalculator {
         // Format all monetary values with $ symbol
         const monetaryFields = [
             'car_price', 'tradein_price', 'deposit_price', 'down_payment',
-            'docfee_amount', 'lo_jack_amount', 'gov_fee', 'dealerpreparation_fee',
-            'certification_bundle_fee', 'sellingaddons_price'
+            'docfee_amount', 'lo_jack_amount', 'salestax_price', 'gov_fee', 
+            'dealerpreparation_fee', 'certification_bundle_fee', 'sellingaddons_price'
         ];
 
         // Format monetary form fields
@@ -238,6 +239,9 @@ class ContractCalculator {
             if (webhookData[field] !== undefined && webhookData[field] !== '') {
                 const amount = this.parseNumber(webhookData[field]);
                 webhookData[field] = this.formatCurrencyForWebhook(amount);
+            } else if (webhookData[field] !== undefined) {
+                // If field exists but is empty, format as $ 0.00
+                webhookData[field] = this.formatCurrencyForWebhook(0);
             }
         });
 
@@ -249,7 +253,7 @@ class ContractCalculator {
             }
         });
 
-        // Format calculated values
+        // Format calculated values with $ symbol
         webhookData.trade_diff = this.formatCurrencyForWebhook(this.calculations.tradeDifference);
         webhookData.duenow_price = this.formatCurrencyForWebhook(this.calculations.amountDue);
         webhookData.carPrice = this.formatCurrencyForWebhook(this.calculations.carPrice);
