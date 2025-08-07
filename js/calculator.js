@@ -110,6 +110,14 @@ class ContractCalculator {
         }).format(amount);
     }
 
+    // Format currency for webhook (with $ symbol)
+    formatCurrencyForWebhook(amount) {
+        if (amount === 0 || amount === null || amount === undefined) {
+            return '$0.00';
+        }
+        return `$${this.roundToCents(amount).toFixed(2)}`;
+    }
+
     // Get all calculations
     getCalculations() {
         return this.calculations;
@@ -212,13 +220,55 @@ class ContractCalculator {
 
     // Get all form data for webhook
     getFormDataForWebhook() {
-        return {
+        // Create base data object
+        const webhookData = {
             ...this.formData,
-            ...this.calculations,
-            calculated_at: new Date().toISOString(),
-            trade_diff: this.calculations.tradeDifference,
-            duenow_price: this.calculations.amountDue
+            calculated_at: new Date().toISOString()
         };
+
+        // Format all monetary values with $ symbol
+        const monetaryFields = [
+            'car_price', 'tradein_price', 'deposit_price', 'down_payment',
+            'docfee_amount', 'lo_jack_amount', 'gov_fee', 'dealerpreparation_fee',
+            'certification_bundle_fee', 'sellingaddons_price'
+        ];
+
+        // Format monetary form fields
+        monetaryFields.forEach(field => {
+            if (webhookData[field] !== undefined && webhookData[field] !== '') {
+                const amount = this.parseNumber(webhookData[field]);
+                webhookData[field] = this.formatCurrencyForWebhook(amount);
+            }
+        });
+
+        // Format dynamic accessories and services
+        Object.keys(webhookData).forEach(key => {
+            if (key.includes('_amount_extra_')) {
+                const amount = this.parseNumber(webhookData[key]);
+                webhookData[key] = this.formatCurrencyForWebhook(amount);
+            }
+        });
+
+        // Format calculated values
+        webhookData.trade_diff = this.formatCurrencyForWebhook(this.calculations.tradeDifference);
+        webhookData.duenow_price = this.formatCurrencyForWebhook(this.calculations.amountDue);
+        webhookData.carPrice = this.formatCurrencyForWebhook(this.calculations.carPrice);
+        webhookData.tradeInValue = this.formatCurrencyForWebhook(this.calculations.tradeInValue);
+        webhookData.depositAmount = this.formatCurrencyForWebhook(this.calculations.depositAmount);
+        webhookData.downPayment = this.formatCurrencyForWebhook(this.calculations.downPayment);
+        webhookData.docFee = this.formatCurrencyForWebhook(this.calculations.docFee);
+        webhookData.salesTax = this.formatCurrencyForWebhook(this.calculations.salesTax);
+        webhookData.totalAccessories = this.formatCurrencyForWebhook(this.calculations.totalAccessories);
+        webhookData.totalService = this.formatCurrencyForWebhook(this.calculations.totalService);
+        webhookData.loJackFee = this.formatCurrencyForWebhook(this.calculations.loJackFee);
+        webhookData.subtotal = this.formatCurrencyForWebhook(this.calculations.subtotal);
+        webhookData.amountDue = this.formatCurrencyForWebhook(this.calculations.amountDue);
+        webhookData.monthlyPayment = this.formatCurrencyForWebhook(this.calculations.monthlyPayment);
+        webhookData.dynamicAccessories = this.formatCurrencyForWebhook(this.calculations.dynamicAccessories);
+        webhookData.dynamicServices = this.formatCurrencyForWebhook(this.calculations.dynamicServices);
+        webhookData.tradeDifference = this.formatCurrencyForWebhook(this.calculations.tradeDifference);
+
+        return webhookData;
     }
 
     // Reset calculator
