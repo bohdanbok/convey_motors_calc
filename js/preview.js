@@ -32,9 +32,10 @@ class ContractPreview {
             ${this.renderVehicleInfo(formData)}
             ${formData.tradein_toggle ? this.renderTradeInInfo(formData) : ''}
             ${this.renderFinancialSummary(formData, formattedCalc)}
+            ${this.renderWarranty(formData)}
             ${formData.cobuyer_toggle ? this.renderCoBuyerInfo(formData) : ''}
             ${this.renderAdditionalInfo(formData)}
-            ${formData.lien_toggle ? this.renderLienInfo(formData) : ''}
+            ${formData.lien_type && formData.lien_type !== 'cash' ? this.renderLienInfo(formData) : ''}
         `;
     }
 
@@ -87,6 +88,23 @@ class ContractPreview {
                     <div class="preview-item">
                         <div class="preview-label">Residence Phone</div>
                         <div class="preview-value ${!data.buyer_residencephone ? 'empty' : ''}">${this.formatPhone(data.buyer_residencephone) || 'Not provided'}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Render warranty selection
+    renderWarranty(data) {
+        if (!data.warranty_type) return '';
+        const label = data.warranty_type === 'AS_IS' ? 'No Warranty' : 'Warranty';
+        return `
+            <div class="preview-section">
+                <h3>Warranty</h3>
+                <div class="preview-grid">
+                    <div class="preview-item">
+                        <div class="preview-label">Selected</div>
+                        <div class="preview-value">${label}</div>
                     </div>
                 </div>
             </div>
@@ -209,7 +227,7 @@ class ContractPreview {
                     <span class="financial-label">Down Payment</span>
                     <span class="financial-value">${formattedCalc.downPayment}</span>
                 </div>
-                ${data.contract_template === 'NJ' ? `
+                ${['NJ','NY','PA'].includes(data.contract_template) ? `
                 <div class="financial-item">
                     <span class="financial-label">Total Taxes</span>
                     <span class="financial-value">${formattedCalc.salesTax}</span>

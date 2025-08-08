@@ -580,6 +580,8 @@
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
 }
 
+/* Warranty buttons reuse template-btn styles */
+
 .template-state {
     font-size: 0.9rem;
     font-weight: 600;

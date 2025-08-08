@@ -16,7 +16,6 @@ class ContractCalculator {
         this.calculations = {
             carPrice: this.roundToCents(this.parseNumber(this.formData.car_price) || 0),
             tradeInValue: this.roundToCents(this.parseNumber(this.formData.tradein_price) || 0),
-            depositAmount: this.roundToCents(this.parseNumber(this.formData.deposit_price) || 0),
             downPayment: this.roundToCents(this.parseNumber(this.formData.down_payment) || 0),
             docFee: this.roundToCents(this.parseNumber(this.formData.docfee_amount) || 0),
             salesTaxRate: this.parseNumber(this.formData.salestax_price) || 0,
@@ -41,9 +40,9 @@ class ContractCalculator {
                                    this.calculations.totalAccessories + 
                                    this.calculations.totalService);
 
-        // Calculate sales tax only for NJ template
+        // Calculate sales tax for NJ, NY, and PA templates
         const selectedTemplate = this.formData.contract_template || '';
-        if (selectedTemplate === 'NJ') {
+        if (['NJ', 'NY', 'PA'].includes(selectedTemplate)) {
             this.calculations.salesTax = this.roundToCents((this.calculations.subtotal * this.calculations.salesTaxRate) / 100);
         } else {
             this.calculations.salesTax = 0;
@@ -131,7 +130,6 @@ class ContractCalculator {
             carPrice: this.formatCurrency(calc.carPrice),
             tradeInValue: this.formatCurrency(calc.tradeInValue),
             tradeDifference: this.formatCurrency(calc.tradeDifference),
-            depositAmount: this.formatCurrency(calc.depositAmount),
             downPayment: this.formatCurrency(calc.downPayment),
             docFee: this.formatCurrency(calc.docFee),
             salesTax: this.formatCurrency(calc.salesTax),
@@ -158,9 +156,12 @@ class ContractCalculator {
             'car_year',
             'car_make',
             'car_model',
+            'car_miles',
             'car_vin',
+            'dealer_stock',
             'car_price',
-            'contract_template'
+            'contract_template',
+            'warranty_type'
         ];
 
         // Add co-buyer fields if toggle is enabled
@@ -229,9 +230,8 @@ class ContractCalculator {
 
         // Format all monetary values with $ symbol
         const monetaryFields = [
-            'car_price', 'tradein_price', 'deposit_price', 'down_payment',
-            'docfee_amount', 'lo_jack_amount', 'salestax_price', 'gov_fee', 
-            'dealerpreparation_fee', 'certification_bundle_fee', 'sellingaddons_price'
+            'car_price', 'tradein_price', 'down_payment',
+            'docfee_amount', 'lo_jack_amount', 'salestax_price'
         ];
 
         // Format monetary form fields
@@ -258,7 +258,6 @@ class ContractCalculator {
         webhookData.duenow_price = this.formatCurrencyForWebhook(this.calculations.amountDue);
         webhookData.carPrice = this.formatCurrencyForWebhook(this.calculations.carPrice);
         webhookData.tradeInValue = this.formatCurrencyForWebhook(this.calculations.tradeInValue);
-        webhookData.depositAmount = this.formatCurrencyForWebhook(this.calculations.depositAmount);
         webhookData.downPayment = this.formatCurrencyForWebhook(this.calculations.downPayment);
         webhookData.docFee = this.formatCurrencyForWebhook(this.calculations.docFee);
         webhookData.salesTax = this.formatCurrencyForWebhook(this.calculations.salesTax);
@@ -271,6 +270,10 @@ class ContractCalculator {
         webhookData.dynamicAccessories = this.formatCurrencyForWebhook(this.calculations.dynamicAccessories);
         webhookData.dynamicServices = this.formatCurrencyForWebhook(this.calculations.dynamicServices);
         webhookData.tradeDifference = this.formatCurrencyForWebhook(this.calculations.tradeDifference);
+
+        // Warranty checkboxes for template mapping (mutually exclusive X marks)
+        webhookData.as_is_no_warranty_mark = this.formData.warranty_type === 'AS_IS' ? 'X' : '';
+        webhookData.warranty_mark = this.formData.warranty_type === 'WARRANTY' ? 'X' : '';
 
         return webhookData;
     }

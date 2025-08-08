@@ -42,7 +42,7 @@ const CONFIG = {
         // Default loan term in years
         defaultLoanTerm: 5,
         // Sales tax rate (can be overridden by form input)
-        defaultSalesTaxRate: 0.08, // 8%
+        defaultSalesTaxRate: 0.06625, // 6.625%
     },
     
     // UI Settings

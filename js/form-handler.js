@@ -19,6 +19,7 @@ class FormHandler {
     init() {
         this.setupEventListeners();
         this.setupTemplateButtons();
+        this.setupWarrantyButtons();
         this.setupLockedFields();
         this.setupDynamicFields();
         this.setDefaultDate();
@@ -81,6 +82,33 @@ class FormHandler {
         this.setupLienTypeSelection();
     }
 
+    // Setup warranty selection buttons
+    setupWarrantyButtons() {
+        const warrantyButtons = document.querySelectorAll('.warranty-btn');
+        const hiddenWarrantyInput = document.getElementById('warranty_type');
+        
+        if (!warrantyButtons.length || !hiddenWarrantyInput) return;
+        
+        warrantyButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const type = e.currentTarget.dataset.warranty; // 'AS_IS' or 'WARRANTY'
+                
+                // Toggle selected style
+                warrantyButtons.forEach(btn => btn.classList.remove('selected'));
+                e.currentTarget.classList.add('selected');
+                
+                // Update hidden input
+                hiddenWarrantyInput.value = type;
+                
+                // Update calculator
+                calculator.updateFormData('warranty_type', type);
+                
+                // Update preview
+                preview.updatePreview(calculator.formData, calculator.calculations);
+            });
+        });
+    }
+
     // Handle input changes
     handleInputChange(event) {
         const field = event.target;
@@ -99,6 +127,23 @@ class FormHandler {
 
         // Validate currency fields
         if ((fieldName.includes('price') || fieldName === 'down_payment') && field.type === 'text') {
+        // Validate phone fields (must be exactly 10 digits)
+        if ((fieldName.endsWith('cellphone') || fieldName.endsWith('residencephone')) && field.type === 'tel') {
+            const digits = (value || '').replace(/\D/g, '');
+            if (digits && digits.length !== 10) {
+                return;
+            }
+        }
+
+        // Validate VIN (17 chars, allowed VIN charset, exclude I,O,Q)
+        if (fieldName === 'car_vin') {
+            const vin = (value || '').toUpperCase();
+            const vinRegex = /^[A-HJ-NPR-Z0-9]{0,17}$/; // allow typing up to 17
+            if (!vinRegex.test(vin)) {
+                return;
+            }
+            value = vin;
+        }
             // Allow numbers with up to 2 decimal places
             const currencyPattern = /^\d+(\.\d{1,2})?$/;
             if (value && !currencyPattern.test(value)) {
@@ -230,15 +275,11 @@ class FormHandler {
         });
     }
 
-    // Toggle tax section visibility
+    // Tax section is always visible now
     toggleTaxSection(template) {
         const taxSection = document.getElementById('tax_info_section');
         if (taxSection) {
-            if (template === 'NJ') {
-                taxSection.style.display = 'block';
-            } else {
-                taxSection.style.display = 'none';
-            }
+            taxSection.style.display = 'block';
         }
     }
 
@@ -778,8 +819,11 @@ class FormHandler {
             'Car year is required': 'car_year',
             'Car make is required': 'car_make',
             'Car model is required': 'car_model',
+            'Car miles is required': 'car_miles',
             'Car vin is required': 'car_vin',
             'Car price is required': 'car_price',
+            'Dealer stock is required': 'dealer_stock',
+            'Warranty type is required': 'warranty_type',
             // Co-buyer fields
             'Co-buyerfull name is required': 'cobuyerfull_name',
             'Co-buyer dob is required': 'cobuyer_dob',
